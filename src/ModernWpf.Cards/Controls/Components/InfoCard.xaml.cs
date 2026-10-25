@@ -23,6 +23,17 @@ namespace ModernWpf.Cards.Controls.Components
     {
         private bool _isClosed = false;
 
+        public enum InfoCardType
+        {
+            Default,      // العادي
+            Information,  // معلومة
+            Success,      // نجاح
+            Warning,      // تحذير
+            Error,        // خطأ
+            Question,     // سؤال/استفسار
+            Idea          // فكرة/تلميح
+        }
+
         public InfoCard()
         {
             InitializeComponent();
@@ -169,6 +180,64 @@ namespace ModernWpf.Cards.Controls.Components
             {
                 _isClosed = true;
                 RaiseEvent(new RoutedEventArgs(CloseClickedEvent));
+            }
+        }
+
+
+        // 1. تسجيل الخاصية مع Event ملي تبدل
+        public static readonly DependencyProperty CardTypeProperty =
+            DependencyProperty.Register("CardType", typeof(InfoCardType), typeof(InfoCard),
+                new PropertyMetadata(InfoCardType.Default, OnCardTypeChanged));
+
+        public InfoCardType CardType
+        {
+            get { return (InfoCardType)GetValue(CardTypeProperty); }
+            set { SetValue(CardTypeProperty, value); }
+        }
+
+        // 2. هاد الـ Event غيخدم ملي اليوزر يكتب مثلا: CardType="Success"
+        private static void OnCardTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var card = (InfoCard)d;
+            var newType = (InfoCardType)e.NewValue;
+
+            // 3. بدّل الأيقونة واللون على حسب النوع
+            switch (newType)
+            {
+                case InfoCardType.Success:
+                    card.InfoIcon = IconChar.CheckCircle;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+                    break;
+
+                case InfoCardType.Error:
+                    card.InfoIcon = IconChar.ExclamationCircle;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"));
+                    break;
+
+                case InfoCardType.Information:
+                    card.InfoIcon = IconChar.InfoCircle;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B82F6"));
+                    break;
+
+                case InfoCardType.Warning:
+                    card.InfoIcon = IconChar.ExclamationTriangle;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+                    break;
+
+                case InfoCardType.Question:
+                    card.InfoIcon = IconChar.CircleQuestion;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B5CF6"));
+                    break;
+
+                case InfoCardType.Idea:
+                    card.InfoIcon = IconChar.Lightbulb;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EAB308"));
+                    break;
+
+                case InfoCardType.Default:
+                    card.InfoIcon = IconChar.Circle;
+                    card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#64748B"));
+                    break;
             }
         }
     }
