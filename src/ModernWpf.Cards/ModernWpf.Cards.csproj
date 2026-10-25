@@ -1,14 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
 
-  <ItemGroup>
-    <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
-  </ItemGroup>
+		<!-- 🔴 إعدادات NuGet Package 🔴 -->
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>ModernWpf.Cards</PackageId>
+		<Version>1.0.0</Version>
+
+		<Authors>benrisma133</Authors>
+		<Company>benrisma133</Company>
+		<Description>A modern, lightweight WPF UI component library featuring custom cards and animations.</Description>
+		<PackageTags>WPF;UI;Components;Cards;ModernWpf</PackageTags>
+
+		<RepositoryUrl>https://github.com/benrisma133/ModernWpf.Cards</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="Assets\" />
+		<Folder Include="Controls\Cards\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FontAwesome.Sharp" Version="6.3.0" />
+	</ItemGroup>
 
 </Project>

@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Ignore the Demo project completely
 src/ModernWpf.Cards.Demo/
+
+# Ignore GitHub Token file
+githubtoken.txt
