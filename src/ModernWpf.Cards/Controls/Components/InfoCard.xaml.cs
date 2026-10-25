@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -159,17 +160,34 @@ namespace ModernWpf.Cards.Controls.Components
         }
 
         // 2. ملي كيتكليكا زر الإغلاق لداخل (✖️)
-        private async void InfoCard_Loaded(object sender, RoutedEventArgs e)
+        private void InfoCard_Loaded(object sender, RoutedEventArgs e)
         {
-            // كنتسناو 3 ثواني (3000 ميلي ثانية) بلا ما نبلوكيو الشاشة
-            await Task.Delay(AutoCloseDelay);
-
-            // يلا دازت 3 ثواني واليوزر مازال ما سدهاش بيدو
-            if (!_isClosed)
+            if (AutoCloseDelay > 0)
             {
-                _isClosed = true;
-                // كنطلقو الحدث بحال يلا كليكا على الزر
-                RaiseEvent(new RoutedEventArgs(CloseClickedEvent));
+                // 1. تشغيل الأنيميشن ديال شريط الوقت
+                DoubleAnimation timerAnimation = new DoubleAnimation
+                {
+                    From = 1.0,
+                    To = 0.0,
+                    Duration = TimeSpan.FromMilliseconds(AutoCloseDelay)
+                };
+
+                // 2. فاش سالا الوقت والأنيميشن
+                timerAnimation.Completed += (s, ev) =>
+                {
+                    if (!_isClosed && this.Visibility == Visibility.Visible)
+                    {
+                        _isClosed = true;
+                        RaiseEvent(new RoutedEventArgs(CloseClickedEvent));
+                    }
+                };
+
+                TimerScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, timerAnimation);
+            }
+            else
+            {
+                // إلى كان الوقت 0، نخفيو الشريط
+                TimerBar.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -240,5 +258,6 @@ namespace ModernWpf.Cards.Controls.Components
                     break;
             }
         }
+
     }
 }
