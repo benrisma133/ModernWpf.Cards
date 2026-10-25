@@ -31,6 +31,24 @@ namespace ModernWpf.Cards.Controls.Components
         }
 
         // ====================================
+        //  Auto Close Delay Dependency Property
+        // ====================================
+
+        public static readonly DependencyProperty AutoCloseDelayProperty =
+            DependencyProperty.Register(
+                    "AutoCloseDelay",
+                    typeof(int),
+                    typeof(InfoCard),
+                    new PropertyMetadata(3000)
+                );
+
+        public int AutoCloseDelay
+        {
+            get { return (int)GetValue(AutoCloseDelayProperty); }
+            set { SetValue(AutoCloseDelayProperty, value); }
+        }
+
+        // ====================================
         //  Icon Dependency Property
         // ====================================
 
@@ -133,7 +151,7 @@ namespace ModernWpf.Cards.Controls.Components
         private async void InfoCard_Loaded(object sender, RoutedEventArgs e)
         {
             // كنتسناو 3 ثواني (3000 ميلي ثانية) بلا ما نبلوكيو الشاشة
-            await Task.Delay(3000);
+            await Task.Delay(AutoCloseDelay);
 
             // يلا دازت 3 ثواني واليوزر مازال ما سدهاش بيدو
             if (!_isClosed)
