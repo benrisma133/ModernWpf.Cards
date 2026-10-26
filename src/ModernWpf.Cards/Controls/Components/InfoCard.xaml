@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ModernWpf.Cards.Controls.Components"
              xmlns:fa="clr-namespace:FontAwesome.Sharp;assembly=FontAwesome.Sharp"
              mc:Ignorable="d" 
+             Cursor="Hand"
              x:Name="Root">
     
     <UserControl.RenderTransform>

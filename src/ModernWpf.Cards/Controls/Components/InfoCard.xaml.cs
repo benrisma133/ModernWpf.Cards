@@ -1,19 +1,10 @@
 ﻿using FontAwesome.Sharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ModernWpf.Cards.Controls.Components
 {
@@ -23,36 +14,30 @@ namespace ModernWpf.Cards.Controls.Components
     public partial class InfoCard : UserControl
     {
         private bool _isClosed = false;
+        private DoubleAnimation? _timerAnimation;
+        private AnimationClock? _timerClock;
+        private ClockController? _timerController;
 
         public enum InfoCardType
         {
-            Default,      // العادي
-            Information,  // معلومة
-            Success,      // نجاح
-            Warning,      // تحذير
-            Error,        // خطأ
-            Question,     // سؤال/استفسار
-            Idea          // فكرة/تلميح
+            Default,
+            Information,
+            Success,
+            Warning,
+            Error,
+            Question,
+            Idea
         }
 
         public InfoCard()
         {
             InitializeComponent();
-
             this.Loaded += InfoCard_Loaded;
         }
 
-        // ====================================
-        //  Auto Close Delay Dependency Property
-        // ====================================
-
+        // --- Dependency Properties ---
         public static readonly DependencyProperty AutoCloseDelayProperty =
-            DependencyProperty.Register(
-                    "AutoCloseDelay",
-                    typeof(int),
-                    typeof(InfoCard),
-                    new PropertyMetadata(3000)
-                );
+            DependencyProperty.Register("AutoCloseDelay", typeof(int), typeof(InfoCard), new PropertyMetadata(3000));
 
         public int AutoCloseDelay
         {
@@ -60,17 +45,8 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(AutoCloseDelayProperty, value); }
         }
 
-        // ====================================
-        //  Icon Dependency Property
-        // ====================================
-
         public static readonly DependencyProperty InfoIconProperty =
-            DependencyProperty.Register(
-                    nameof(InfoIcon),
-                    typeof(IconChar),
-                    typeof(InfoCard),
-                    new PropertyMetadata(IconChar.InfoCircle)
-                );
+            DependencyProperty.Register(nameof(InfoIcon), typeof(IconChar), typeof(InfoCard), new PropertyMetadata(IconChar.InfoCircle));
 
         public IconChar InfoIcon
         {
@@ -78,17 +54,8 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(InfoIconProperty, value); }
         }
 
-        // ====================================
-        //  Title Dependency Property
-        // ====================================
-
         public static readonly DependencyProperty InfoTitleProperty =
-            DependencyProperty.Register(
-                    nameof(InfoTitle),
-                    typeof(string),
-                    typeof(InfoCard),
-                    new PropertyMetadata("Title", OnTitleChanged)
-                );
+            DependencyProperty.Register(nameof(InfoTitle), typeof(string), typeof(InfoCard), new PropertyMetadata("Title"));
 
         public string InfoTitle
         {
@@ -96,23 +63,8 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(InfoTitleProperty, value); }
         }
 
-        private static void OnTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var card = d as InfoCard;
-            string? newValue = e.NewValue as string;
-        }
-
-        // ====================================
-        //  Description Dependency Property
-        // ====================================
-
         public static readonly DependencyProperty InfoDescriptionProperty =
-            DependencyProperty.Register(
-                    nameof(InfoDescription),
-                    typeof(string),
-                    typeof(InfoCard),
-                    new PropertyMetadata("Description", OnDescriptionChanged)
-                );
+            DependencyProperty.Register(nameof(InfoDescription), typeof(string), typeof(InfoCard), new PropertyMetadata("Description"));
 
         public string InfoDescription
         {
@@ -120,23 +72,8 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(InfoDescriptionProperty, value); }
         }
 
-        private static void OnDescriptionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var card = d as InfoCard;
-            string? newValue = e.NewValue as string;
-        }
-
-        // ======================================
-        //  Icon Background Dependency Property
-        // ======================================
-
         public static readonly DependencyProperty IconBackgroundProperty =
-            DependencyProperty.Register(
-                    nameof(IconBackground),
-                    typeof(Brush),
-                    typeof(InfoCard),
-                    new PropertyMetadata(null)
-                );
+            DependencyProperty.Register(nameof(IconBackground), typeof(Brush), typeof(InfoCard), new PropertyMetadata(null));
 
         public Brush IconBackground
         {
@@ -144,14 +81,8 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(IconBackgroundProperty, value); }
         }
 
-
         public static readonly RoutedEvent CloseClickedEvent =
-            EventManager.RegisterRoutedEvent(
-                "CloseClicked",
-                RoutingStrategy.Bubble,
-                typeof(RoutedEventHandler),
-                typeof(InfoCard)
-            );
+            EventManager.RegisterRoutedEvent("CloseClicked", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(InfoCard));
 
         public event RoutedEventHandler CloseClicked
         {
@@ -159,21 +90,19 @@ namespace ModernWpf.Cards.Controls.Components
             remove { RemoveHandler(CloseClickedEvent, value); }
         }
 
-        // 2. ملي كيتكليكا زر الإغلاق لداخل (✖️)
         private void InfoCard_Loaded(object sender, RoutedEventArgs e)
         {
             if (AutoCloseDelay > 0)
             {
-                // 1. تشغيل الأنيميشن ديال شريط الوقت
-                DoubleAnimation timerAnimation = new DoubleAnimation
+                _timerAnimation = new DoubleAnimation
                 {
                     From = 1.0,
                     To = 0.0,
-                    Duration = TimeSpan.FromMilliseconds(AutoCloseDelay)
+                    Duration = TimeSpan.FromMilliseconds(AutoCloseDelay),
+                    FillBehavior = FillBehavior.HoldEnd
                 };
 
-                // 2. فاش سالا الوقت والأنيميشن
-                timerAnimation.Completed += (s, ev) =>
+                _timerAnimation.Completed += (s, ev) =>
                 {
                     if (!_isClosed && this.Visibility == Visibility.Visible)
                     {
@@ -182,16 +111,19 @@ namespace ModernWpf.Cards.Controls.Components
                     }
                 };
 
-                TimerScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, timerAnimation);
+                // طريقة مباشرة ومضمونة لإنشاء الـ Clock والتحكم فيها
+                _timerClock = _timerAnimation.CreateClock();
+                _timerController = _timerClock.Controller;
+
+                // تطبيق الأنيميشن على ScaleX
+                TimerScaleTransform.ApplyAnimationClock(ScaleTransform.ScaleXProperty, _timerClock);
             }
             else
             {
-                // إلى كان الوقت 0، نخفيو الشريط
                 TimerBar.Visibility = Visibility.Collapsed;
             }
         }
 
-        // 4. ملي كيكليكي اليوزر على زر (✖️)
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (!_isClosed)
@@ -201,8 +133,26 @@ namespace ModernWpf.Cards.Controls.Components
             }
         }
 
+        // --- Mouse Hover Pause / Resume ---
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+            base.OnMouseEnter(e);
+            if (_timerController != null && _timerClock?.CurrentState == ClockState.Active)
+            {
+                _timerController.Pause();
+            }
+        }
 
-        // 1. تسجيل الخاصية مع Event ملي تبدل
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            if (_timerController != null && _timerClock?.CurrentState == ClockState.Active)
+            {
+                _timerController.Resume();
+            }
+        }
+
+        // --- Card Type Logic ---
         public static readonly DependencyProperty CardTypeProperty =
             DependencyProperty.Register("CardType", typeof(InfoCardType), typeof(InfoCard),
                 new PropertyMetadata(InfoCardType.Default, OnCardTypeChanged));
@@ -213,51 +163,42 @@ namespace ModernWpf.Cards.Controls.Components
             set { SetValue(CardTypeProperty, value); }
         }
 
-        // 2. هاد الـ Event غيخدم ملي اليوزر يكتب مثلا: CardType="Success"
         private static void OnCardTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var card = (InfoCard)d;
             var newType = (InfoCardType)e.NewValue;
 
-            // 3. بدّل الأيقونة واللون على حسب النوع
             switch (newType)
             {
                 case InfoCardType.Success:
                     card.InfoIcon = IconChar.CheckCircle;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
                     break;
-
                 case InfoCardType.Error:
                     card.InfoIcon = IconChar.ExclamationCircle;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"));
                     break;
-
                 case InfoCardType.Information:
                     card.InfoIcon = IconChar.InfoCircle;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B82F6"));
                     break;
-
                 case InfoCardType.Warning:
                     card.InfoIcon = IconChar.ExclamationTriangle;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
                     break;
-
                 case InfoCardType.Question:
                     card.InfoIcon = IconChar.CircleQuestion;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8B5CF6"));
                     break;
-
                 case InfoCardType.Idea:
                     card.InfoIcon = IconChar.Lightbulb;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EAB308"));
                     break;
-
-                case InfoCardType.Default:
+                default:
                     card.InfoIcon = IconChar.Circle;
                     card.IconBackground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#64748B"));
                     break;
             }
         }
-
     }
 }
