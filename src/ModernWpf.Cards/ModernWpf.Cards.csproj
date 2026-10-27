@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>net8.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -10,14 +9,15 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>ModernWpf.Cards</PackageId>
 		<Version>1.0.4</Version>
-
 		<Authors>benrisma133</Authors>
 		<Company>benrisma133</Company>
 		<Description>A modern, lightweight WPF UI component library featuring custom cards and animations.</Description>
 		<PackageTags>WPF;UI;Components;Cards;ModernWpf</PackageTags>
-
 		<RepositoryUrl>https://github.com/benrisma133/ModernWpf.Cards</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
+
+		<!-- 🌟 زِيد هاد السطر هنا باش يربط الـ README -->
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,6 +27,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="FontAwesome.Sharp" Version="6.3.0" />
-	</ItemGroup>
 
+		<!-- 🌟 وزِيد هاد الـ ItemGroup باش يجيب الـ README من الـ Root -->
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 </Project>
