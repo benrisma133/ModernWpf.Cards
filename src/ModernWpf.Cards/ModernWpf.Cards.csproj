@@ -9,7 +9,7 @@
 		<!-- 🔴 إعدادات NuGet Package 🔴 -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>ModernWpf.Cards</PackageId>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 
 		<Authors>benrisma133</Authors>
 		<Company>benrisma133</Company>

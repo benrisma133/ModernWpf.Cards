@@ -75,13 +75,25 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- 1. خلفية الأيقونة (Icon Background) -->
-            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+            <!-- 1. خلفية الأيقونة (Icon Background) مع دعم ShowIcon -->
+            <Border x:Name="IconBorder"
+                    Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
                     Background="{Binding IconBackground, ElementName=Root}"
                     Width="48" Height="48"
                     CornerRadius="10"
                     Margin="0,0,15,0"
                     VerticalAlignment="Top">
+
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowIcon, ElementName=Root}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
 
                 <fa:IconImage Icon="{Binding InfoIcon, ElementName=Root}" 
                               Foreground="White" 

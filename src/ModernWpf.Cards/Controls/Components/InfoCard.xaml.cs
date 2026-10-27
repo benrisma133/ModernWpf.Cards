@@ -200,5 +200,23 @@ namespace ModernWpf.Cards.Controls.Components
                     break;
             }
         }
+
+        // ====================================
+        //  Show Icon Dependency Property
+        // ====================================
+
+        public static readonly DependencyProperty ShowIconProperty =
+            DependencyProperty.Register(
+                    nameof(ShowIcon),
+                    typeof(bool),
+                    typeof(InfoCard),
+                    new PropertyMetadata(true)
+                );
+
+        public bool ShowIcon
+        {
+            get { return (bool)GetValue(ShowIconProperty); }
+            set { SetValue(ShowIconProperty, value); }
+        }
     }
 }
