@@ -1,5 +1,6 @@
 ﻿using FontAwesome.Sharp;
 using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,9 +9,6 @@ using System.Windows.Media.Animation;
 
 namespace ModernWpf.Cards.Controls.Components
 {
-    /// <summary>
-    /// Interaction logic for InfoCard.xaml
-    /// </summary>
     public partial class InfoCard : UserControl
     {
         private bool _isClosed = false;
@@ -32,7 +30,41 @@ namespace ModernWpf.Cards.Controls.Components
         public InfoCard()
         {
             InitializeComponent();
+
+            ActionsList.ItemsSource = Actions;
+            Actions.CollectionChanged += (s, e) => UpdateFooterVisibility();
+            UpdateFooterVisibility();
+
             this.Loaded += InfoCard_Loaded;
+        }
+
+        // --- Action Buttons ---
+        public ObservableCollection<CardAction> Actions { get; } = new ObservableCollection<CardAction>();
+
+        public static readonly RoutedEvent ActionClickedEvent =
+            EventManager.RegisterRoutedEvent("ActionClicked", RoutingStrategy.Bubble, typeof(CardActionEventHandler), typeof(InfoCard));
+
+        public event CardActionEventHandler ActionClicked
+        {
+            add { AddHandler(ActionClickedEvent, value); }
+            remove { RemoveHandler(ActionClickedEvent, value); }
+        }
+
+        private void UpdateFooterVisibility()
+        {
+            ActionsFooter.Visibility = Actions.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isClosed) return;
+            if (((FrameworkElement)sender).DataContext is not CardAction action) return;
+
+            // Tell the host which action was clicked, then close the card
+            RaiseEvent(new CardActionEventArgs(ActionClickedEvent, this, action));
+
+            _isClosed = true;
+            RaiseEvent(new RoutedEventArgs(CloseClickedEvent));
         }
 
         // --- Dependency Properties ---
@@ -111,11 +143,9 @@ namespace ModernWpf.Cards.Controls.Components
                     }
                 };
 
-                // طريقة مباشرة ومضمونة لإنشاء الـ Clock والتحكم فيها
                 _timerClock = _timerAnimation.CreateClock();
                 _timerController = _timerClock.Controller;
 
-                // تطبيق الأنيميشن على ScaleX
                 TimerScaleTransform.ApplyAnimationClock(ScaleTransform.ScaleXProperty, _timerClock);
             }
             else
@@ -201,10 +231,7 @@ namespace ModernWpf.Cards.Controls.Components
             }
         }
 
-        // ====================================
-        //  Show Icon Dependency Property
-        // ====================================
-
+        // --- Show Icon ---
         public static readonly DependencyProperty ShowIconProperty =
             DependencyProperty.Register(
                     nameof(ShowIcon),
