@@ -1,13 +1,13 @@
-# ModernWpf.Cards v1.0.4
+# ModernWpf.Cards v1.0.5
 
-A modern, customizable WPF card control library for .NET 8 desktop applications. This release adds custom icons, icon backgrounds, and icon visibility control to `InfoCard`.
+A modern, customizable WPF card control library for .NET 8 desktop applications. This release adds action buttons to the footer of `InfoCard`.
 
 ## Installation
 
 Install from NuGet.org:
 
 ```bash
-dotnet add package ModernWpf.Cards -v 1.0.4
+dotnet add package ModernWpf.Cards -v 1.0.5
 ```
 
 Install from GitHub Packages (optional):
@@ -22,19 +22,12 @@ dotnet nuget add source https://nuget.pkg.github.com/OWNER/index.json \
   --store-password-in-clear-text
 ```
 
-Then install the package:
-
-```bash
-dotnet add package ModernWpf.Cards -v 1.0.4 --source github
-```
-
-> Replace `OWNER`, `YOUR_USERNAME`, and `YOUR_TOKEN` with your own values.
-
 ## What's New in this Version
 
-- **`InfoIcon`:** choose any icon from FontAwesome (`IconChar`), such as `Download` or `Bell`.
-- **`IconBackground`:** set the icon background with any `Brush`. The progress bar uses the same brush.
-- **`ShowIcon`:** show or hide the icon. It is shown by default.
+- **Action buttons:** add buttons such as "Undo", "Retry", or "View Details" to the bottom of a card. The buttons appear only when you add at least one action.
+- **`ActionClicked` event:** raised when a button is clicked, with the button's `Id` so you know which one was pressed.
+- **Automatic close:** clicking any action button closes the card.
+- **Shared button style:** action buttons use `CardActionButtonStyle`, so they look the same everywhere.
 
 ## Quick Start
 
@@ -44,40 +37,47 @@ Add the namespace to your XAML root element:
 xmlns:components="clr-namespace:ModernWpf.Cards.Controls.Components;assembly=ModernWpf.Cards"
 ```
 
-Show a card with a custom icon and background:
+Show a card with an Undo button:
 
 ```xml
-<components:InfoCard InfoTitle="Custom Download"
-                     InfoDescription="Your file is downloading with custom branding."
-                     InfoIcon="Download"
-                     IconBackground="#8B5CF6"
-                     ShowIcon="True"
-                     AutoCloseDelay="5000" />
+<components:InfoCard InfoTitle="File deleted"
+                     InfoDescription="The file was moved to the recycle bin."
+                     CardType="Warning"
+                     ActionClicked="InfoCard_ActionClicked">
+    <components:InfoCard.Actions>
+        <components:CardAction Id="Undo" Text="Undo" />
+        <components:CardAction Id="Details" Text="View Details" />
+    </components:InfoCard.Actions>
+</components:InfoCard>
 ```
 
-Hide the icon:
-
-```xml
-<components:InfoCard InfoTitle="Plain Notice"
-                     InfoDescription="This card has no icon."
-                     ShowIcon="False" />
-```
-
-Or create the card in code:
+Handle the click in code-behind:
 
 ```csharp
-using System.Windows.Media;
-using FontAwesome.Sharp;
-using ModernWpf.Cards.Controls.Components;
+private void InfoCard_ActionClicked(object sender, CardActionEventArgs e)
+{
+    if (e.ActionId == "Undo")
+    {
+        RestoreFile();
+    }
+}
+```
 
+Or add the card and its actions in code:
+
+```csharp
 var card = new InfoCard
 {
-    InfoTitle = "Custom Download",
-    InfoDescription = "Your file is downloading with custom branding.",
-    InfoIcon = IconChar.Download,
-    IconBackground = new SolidColorBrush(Color.FromRgb(0x8B, 0x5C, 0xF6)), // #8B5CF6
-    ShowIcon = true,
-    AutoCloseDelay = 5000
+    InfoTitle = "File deleted",
+    InfoDescription = "The file was moved to the recycle bin.",
+    CardType = InfoCard.InfoCardType.Warning
+};
+
+card.Actions.Add(new CardAction { Id = "Undo", Text = "Undo" });
+card.Actions.Add(new CardAction { Id = "Details", Text = "View Details" });
+card.ActionClicked += (s, e) =>
+{
+    if (e.ActionId == "Undo") RestoreFile();
 };
 
 MyContainer.Children.Add(card); // MyContainer is any Panel, e.g. a StackPanel
@@ -85,13 +85,11 @@ MyContainer.Children.Add(card); // MyContainer is any Panel, e.g. a StackPanel
 
 ### Handling Close
 
-The card hides itself when the countdown finishes or the close button is clicked. It then raises `CloseClicked`, so you can remove it from your layout:
+The card hides itself when the countdown finishes, the close button is clicked, or an action button is clicked. It then raises `CloseClicked`, so you can remove it from your layout:
 
 ```csharp
 card.CloseClicked += (s, e) => MyContainer.Children.Remove(card);
 ```
-
-> If you set `CardType` together with a custom `InfoIcon` or `IconBackground`, the card type's values can overwrite them. Set `CardType` first, then set the custom values in code, or leave `CardType` out.
 
 ## License
 
