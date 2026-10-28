@@ -39,7 +39,7 @@ jobs:
 
       - name: Push to NuGet.org
         run: >
-          dotnet nuget push "./nupkg/*.nupkg"
+          dotnet nuget push "./nupkg/ModernWpf.Cards.${{ steps.version.outputs.VERSION }}.nupkg"
           --api-key ${{ secrets.NUGET_API_KEY }}
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
