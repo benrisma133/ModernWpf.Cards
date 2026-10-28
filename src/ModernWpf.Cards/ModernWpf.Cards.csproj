@@ -8,7 +8,7 @@
 		<!-- 🔴 إعدادات NuGet Package 🔴 -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>ModernWpf.Cards</PackageId>
-		<Version>1.0.4</Version>
+		<Version>1.0.5</Version>
 		<Authors>benrisma133</Authors>
 		<Company>benrisma133</Company>
 		<Description>A modern, lightweight WPF UI component library featuring custom cards and animations.</Description>
